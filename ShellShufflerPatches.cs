@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using BattleTech;
 using UnityEngine;
 using ShellShuffler;
-using IRBTModUtils;
 using BattleTech.Data;
 using ShellShuffler.Init;
 
@@ -97,20 +96,16 @@ namespace ShellShuffler.Patches
 
                                 }
                             }
-
                             ModInit.modLog.LogMessage($"Filtering potential ammo boxes and types by tonnage!");
+                            
 
-                            ///////////////cut content for blacklist and tag filter goes here maybe?
-                            //filter by tags?
                             string ammolog = string.Empty;
+
                             if (ModInit.modSettings.mechDefTagAmmoList.Any())
                             {
                                 var unitTags = unit.GetTags();
 
                                 var tagKeys = new List<string>(ModInit.modSettings.mechDefTagAmmoList.Keys.Where(x => unitTags.Contains(x)));
-
-
-
 
                                 var tagVals = new List<string>();
 
@@ -125,32 +120,49 @@ namespace ShellShuffler.Patches
                                         tagVals.AddRange(ModInit.modSettings.mechDefTagAmmoList[tag]);
                                     }
 
-                                    var taggedAmmo = tagVals.GroupBy(x => x)
-                                        .Select(g => new {Value = g.Key, Count = g.Count()});
-
-                                    var intersectedAmmo = taggedAmmo.Where(x => x.Count == taggedAmmo.Max(g => g.Count));
-
-                                    var finalAmmo = new List<string>();
-                                    foreach (var ammo in intersectedAmmo)
+                                    if (!ModInit.modSettings.tagSetsUnion)
                                     {
-                                        finalAmmo.Add(ammo.Value);
+                                        var taggedAmmo = tagVals.GroupBy(x => x)
+                                            .Select(g => new { Value = g.Key, Count = g.Count() });
+
+                                        var intersectedAmmo = taggedAmmo.Where(x => x.Count == taggedAmmo.Max(g => g.Count));
+
+                                        var finalAmmo = new List<string>();
+                                        foreach (var ammo in intersectedAmmo)
+                                        {
+                                            finalAmmo.Add(ammo.Value);
+                                        }
+                                        tagVals = finalAmmo;
                                     }
+
+                                    tagVals = tagVals.Distinct().ToList();
 
                                     if (tagVals.Any())
                                     {
                                         ModInit.modLog.LogMessage($"Removing ammos per unitDefTags");
-                                        alternateDefsList.RemoveAll(x => !finalAmmo.Contains(x.Description.Id));
+                                        alternateDefsList.RemoveAll(x => !tagVals.Contains(x.Description.Id));
                                         ammolog = string.Join("|", alternateDefsList);
                                         ModInit.modLog.LogMessage(
-                                            $"Remaining valid ammos for {unit.Description.Name}: {ammolog}");
+                                            $"Remaining valid ammos from tags for {unit.Description.Name}: {ammolog}");
                                     }
                                 }
 
                             }
 
+                            if (ModInit.modSettings.factionAmmoList.Any())
+                            {
+                                var unitFID = Traverse.Create(__instance).Field("factionID").GetValue<string>();
 
-                            //working in this still //
+                                if (ModInit.modSettings.factionAmmoList.ContainsKey(unitFID))
+                                {
+                                    List<string> factionAmmos = ModInit.modSettings.factionAmmoList[unitFID];
 
+                                    alternateDefsList.RemoveAll(x => !factionAmmos.Contains(x.Description.Id));
+                                    ammolog = string.Join("|", alternateDefsList);
+                                    ModInit.modLog.LogMessage(
+                                        $"Remaining valid ammos from faction list for {unit.Description.Name}: {ammolog}");
+                                }
+                            }
 
 
                             //remove blacklisted ammo from shuffle pool

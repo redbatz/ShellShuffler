@@ -40,11 +40,12 @@ namespace ShellShuffler.Init
         public bool shuffleMechs = false;
         public bool shuffleVehicles = false;
         public bool shuffleTurrets = false;
-
+        public bool tagSetsUnion = false;
         public float chanceToShuffle = 1f;
 
         public List<string> blackListShuffleIn = new List<string>();
         public List<string> blackListShuffleOut = new List<string>();
+
         public Dictionary<string, List<string>> mechDefTagAmmoList = new Dictionary<string, List<string>>();
 
         public Dictionary<string, int> ammoWeight = new Dictionary<string, int>();

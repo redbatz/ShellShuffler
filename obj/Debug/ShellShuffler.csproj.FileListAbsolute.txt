@@ -82,5 +82,3 @@ D:\Users\Anthony\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.csproj.C
 D:\Users\Anthony\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.csproj.CopyComplete
 D:\Users\Anthony\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.dll
 D:\Users\Anthony\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.pdb
-D:\Users\Anthony\Documents\GitHub\ShellShuffler\bin\Debug\IRBTModUtils.dll
-D:\Users\Anthony\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.csprojAssemblyReference.cache
