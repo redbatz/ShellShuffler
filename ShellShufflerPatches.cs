@@ -2,6 +2,7 @@
 using Harmony;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,10 +16,12 @@ namespace ShellShuffler.Patches
 {
     class ShellShufflerPatches
     {
-        [HarmonyPatch(typeof(CombatGameState), "_Init", new Type[] {typeof(GameInstance), typeof(Contract), typeof(string)})]
+        [HarmonyPatch(typeof(CombatGameState), "_Init",
+            new Type[] {typeof(GameInstance), typeof(Contract), typeof(string)})]
         public static class CGS__Init_patch
         {
-            public static void Postfix(SimGameState __instance, GameInstance game, Contract contract, string localPlayerTeamGuid)
+            public static void Postfix(CombatGameState __instance, GameInstance game, Contract contract,
+                string localPlayerTeamGuid)
             {
                 AmmoHolder.AmmoHolderInstance.Initialize(game.DataManager);
                 ModInit.modLog.LogMessage($"Initialized AmmoHolder");
@@ -28,25 +31,29 @@ namespace ShellShuffler.Patches
         [HarmonyPatch(typeof(Team), "AddUnit", new Type[] {typeof(AbstractActor)})]
         public static class Team_AddUnit
         {
+            private static MethodInfo assignAmmo = AccessTools.Method(typeof(AbstractActor), "AssignAmmoToWeapons");
             public static void Postfix(Team __instance, AbstractActor unit)
             {
                 if (unit.team.IsLocalPlayer) return;
 
                 if (unit is Mech && !ModInit.modSettings.shuffleMechs)
                 {
-                    ModInit.modLog.LogMessage($"{unit.Description.Name} is Mech and shuffleMechs = false; not shuffling!");
+                    ModInit.modLog.LogMessage(
+                        $"{unit.Description.Name} is Mech and shuffleMechs = false; not shuffling!");
                     return;
                 }
 
                 if (unit is Vehicle && !ModInit.modSettings.shuffleVehicles)
                 {
-                    ModInit.modLog.LogMessage($"{unit.Description.Name} is Vehicle and shuffleVehicles = false; not shuffling!");
+                    ModInit.modLog.LogMessage(
+                        $"{unit.Description.Name} is Vehicle and shuffleVehicles = false; not shuffling!");
                     return;
                 }
 
                 if (unit is Turret && !ModInit.modSettings.shuffleTurrets)
                 {
-                    ModInit.modLog.LogMessage($"{unit.Description.Name} is Turret and shuffleTurrets = false; not shuffling!");
+                    ModInit.modLog.LogMessage(
+                        $"{unit.Description.Name} is Turret and shuffleTurrets = false; not shuffling!");
                     return;
                 }
 
@@ -61,7 +68,7 @@ namespace ShellShuffler.Patches
                 }
 
 
-                foreach (var t1 in unit.allComponents)
+                foreach (var t1 in new List<MechComponent>(unit.allComponents))
                 {
                     if (t1.componentType == ComponentType.AmmunitionBox)
                     {
@@ -84,7 +91,7 @@ namespace ShellShuffler.Patches
 
                             var alternateBoxDefsList = new List<AmmunitionBoxDef>();
 
-
+                            ModInit.modLog.LogMessage($"Filtering potential ammo boxes and types by tonnage!");
                             foreach (var alt in AmmoHolder.AmmoHolderInstance.ammoBoxList)
                             {
                                 if (Math.Abs(alt.Tonnage - ab.tonnage) < 0.01)
@@ -93,11 +100,15 @@ namespace ShellShuffler.Patches
                                     alternateDefsList.AddRange(AmmoHolder.AmmoHolderInstance.ammoList.Where(x =>
                                         x?.Description?.Id == alt?.AmmoID && (Equals(x?.AmmoCategoryValue,
                                             ab.ammoDef.AmmoCategoryValue))));
-
                                 }
                             }
-                            ModInit.modLog.LogMessage($"Filtering potential ammo boxes and types by tonnage!");
-                            
+
+                            foreach (var a in alternateDefsList)
+                            {
+                                ModInit.modLog.LogMessage(
+                                    $"Tonnage and category matches found: {a.Description.Name}/{a.Description.UIName}");
+                            }
+
 
                             string ammolog = string.Empty;
 
@@ -105,15 +116,17 @@ namespace ShellShuffler.Patches
                             {
                                 var unitTags = unit.GetTags();
 
-                                var tagKeys = new List<string>(ModInit.modSettings.mechDefTagAmmoList.Keys.Where(x => unitTags.Contains(x)));
+                                var tagKeys =
+                                    new List<string>(
+                                        ModInit.modSettings.mechDefTagAmmoList.Keys.Where(x => unitTags.Contains(x)));
 
                                 var tagVals = new List<string>();
 
                                 if (tagKeys.Any())
                                 {
-                                    List<string> inspectKeys = (List<string>)tagKeys;
-                                    ModInit.modLog.LogMessage($"potential tagkeys: {string.Join("|",tagKeys)}");
-                                    
+                                    List<string> inspectKeys = (List<string>) tagKeys;
+                                    ModInit.modLog.LogMessage($"potential tagkeys: {string.Join("|", tagKeys)}");
+
                                     foreach (var tag in tagKeys)
                                     {
                                         //tagVals.AddRange(tagKeys.Intersect(ModInit.modSettings.mechDefTagAmmoList[tag]));
@@ -123,15 +136,17 @@ namespace ShellShuffler.Patches
                                     if (!ModInit.modSettings.tagSetsUnion)
                                     {
                                         var taggedAmmo = tagVals.GroupBy(x => x)
-                                            .Select(g => new { Value = g.Key, Count = g.Count() });
+                                            .Select(g => new {Value = g.Key, Count = g.Count()});
 
-                                        var intersectedAmmo = taggedAmmo.Where(x => x.Count == taggedAmmo.Max(g => g.Count));
+                                        var intersectedAmmo =
+                                            taggedAmmo.Where(x => x.Count == taggedAmmo.Max(g => g.Count));
 
                                         var finalAmmo = new List<string>();
                                         foreach (var ammo in intersectedAmmo)
                                         {
                                             finalAmmo.Add(ammo.Value);
                                         }
+
                                         tagVals = finalAmmo;
                                     }
 
@@ -192,7 +207,7 @@ namespace ShellShuffler.Patches
                                     }
                                 }
                             }
-                            
+
 
                             ReChoose:
 
@@ -206,7 +221,7 @@ namespace ShellShuffler.Patches
 
 
                             ModInit.modLog.LogMessage(
-                                $"Found potential ammo boxes for {alternateDef?.Description?.Name}/{alternateDef?.Description?.UIName}: {alternateBoxDef?.Description?.UIName}");
+                                $"Found potential ammo boxes for {alternateDef?.Description?.Name}/{alternateDef?.Description?.UIName}: {alternateBoxDef?.Description?.Name}/{alternateBoxDef?.Description?.UIName}");
 
                             if (alternateBoxDef == null)
                             {
@@ -214,24 +229,97 @@ namespace ShellShuffler.Patches
                                 goto ReChoose;
                             }
 
-                            ModInit.modLog.LogMessage(
-                                $"Tonnage match found, swapping {ab.Description.Name}/{ab.Description.UIName} for {alternateDef.Description.Name}/{alternateDef.Description.UIName}.");
+
                             alternateBoxDef.refreshAmmo(AmmoHolder.AmmoHolderInstance.dataManager);
+                            ModInit.modLog.LogMessage(
+                                $"Swapping {ab.Description.Name}/{ab.Description.UIName} for {alternateBoxDef?.Description?.Name}/{alternateBoxDef?.Description?.UIName}.");
 
-                            //////////////////this was added recently!!!
-                            var sim = UnityGameInstance.BattleTechGame.Simulation;
+                            //    var sim = UnityGameInstance.BattleTechGame.Simulation;
 
+                            if (unit is Mech)
+                            {
+                                var mech = unit as Mech;
+                                var mref = new MechComponentRef(alternateBoxDef.Description.Id,
 
-                            var mref = new MechComponentRef(alternateBoxDef.Description.Id,
-                                sim.GenerateSimGameUID(), alternateBoxDef.ComponentType,
-                                t1.LocationDef.Location, -1, ComponentDamageLevel.Functional, false);
+                                    //sim.GenerateSimGameUID(),
+                                    t1.uid, //new 111020
+                                    alternateBoxDef.ComponentType,
+                                    t1.LocationDef.Location, -1, ComponentDamageLevel.Functional, false);
 
-                            Traverse.Create(t1).Property("componentDef").SetValue(alternateBoxDef);
-                            Traverse.Create(t1).Property("mechComponentRef").SetValue(mref);
-                            ab.InitStats();
+                                Traverse.Create(mref).Property("Def").SetValue(alternateBoxDef);
+
+                                AmmunitionBox repAB = new AmmunitionBox(mech, mref, 0.ToString());
+
+                                mech.ammoBoxes.Remove(ab);
+                                mech.ammoBoxes.Add(repAB);
+                                mech.allComponents.Remove(ab);
+                                mech.allComponents.Add(repAB);
+
+//                            Traverse.Create(t1).Property("componentDef").SetValue(alternateBoxDef);
+//                            Traverse.Create(t1).Property("baseComponentRef").SetValue(mref); //added 111020
+//                            Traverse.Create(t1).Property("mechComponentRef").SetValue(mref);
+                                repAB.StatCollection.Reset(false); //added 111020
+                                repAB.InitStats();
+                            }
+
+                            if (unit is Vehicle)
+                            {
+                                var vic = unit as Vehicle;
+                                var vref = new VehicleComponentRef(alternateBoxDef.Description.Id,
+
+                                    //sim.GenerateSimGameUID(),
+                                    t1.uid, //new 111020
+                                    alternateBoxDef.ComponentType,
+                                    t1.VehicleLocationDef.Location, -1, ComponentDamageLevel.Functional);
+
+                                Traverse.Create(vref).Property("Def").SetValue(alternateBoxDef);
+
+                                AmmunitionBox repAB = new AmmunitionBox(vic, vref, 0.ToString());
+
+                                vic.ammoBoxes.Remove(ab);
+                                vic.ammoBoxes.Add(repAB);
+                                vic.allComponents.Remove(ab);
+                                vic.allComponents.Add(repAB);
+
+                                //                            Traverse.Create(t1).Property("componentDef").SetValue(alternateBoxDef);
+                                //                            Traverse.Create(t1).Property("baseComponentRef").SetValue(mref); //added 111020
+                                //                            Traverse.Create(t1).Property("mechComponentRef").SetValue(mref);
+                                repAB.StatCollection.Reset(false); //added 111020
+                                repAB.InitStats();
+                            }
+
+                            if (unit is Turret)
+                            {
+                                var trt = unit as Turret;
+                                var tref = new TurretComponentRef(alternateBoxDef.Description.Id,
+
+                                    //sim.GenerateSimGameUID(),
+                                    t1.uid, //new 111020
+                                    alternateBoxDef.ComponentType,
+                                    t1.VehicleLocationDef.Location, -1, ComponentDamageLevel.Functional);
+
+                                Traverse.Create(tref).Property("Def").SetValue(alternateBoxDef);
+
+                                AmmunitionBox repAB = new AmmunitionBox(trt, tref, 0.ToString());
+
+                                trt.ammoBoxes.Remove(ab);
+                                trt.ammoBoxes.Add(repAB);
+                                trt.allComponents.Remove(ab);
+                                trt.allComponents.Add(repAB);
+
+                                //                            Traverse.Create(t1).Property("componentDef").SetValue(alternateBoxDef);
+                                //                            Traverse.Create(t1).Property("baseComponentRef").SetValue(mref); //added 111020
+                                //                            Traverse.Create(t1).Property("mechComponentRef").SetValue(mref);
+                                repAB.StatCollection.Reset(false); //added 111020
+                                repAB.InitStats();
+                            }
+
                         }
                     }
                 }
+
+                assignAmmo.Invoke(unit, new object[]{});
+                //Traverse.Create(unit).Method("AssignAmmoToWeapons").GetValue();
             }
         }
     }
