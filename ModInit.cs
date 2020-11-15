@@ -42,6 +42,7 @@ namespace ShellShuffler.Init
         public bool shuffleTurrets = false;
         public bool tagSetsUnion = false;
         public float chanceToShuffle = 1f;
+        public int unShuffledBins = 1;
 
         public List<string> blackListShuffleIn = new List<string>();
         public List<string> blackListShuffleOut = new List<string>();

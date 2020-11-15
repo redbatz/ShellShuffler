@@ -66,9 +66,30 @@ namespace ShellShuffler.Patches
                     ModInit.modLog.LogMessage($"Roll of {roll} >= {chance}; not shuffling!");
                     return;
                 }
+                //adding 'running total' of bins?
+
+                var multiBins = unit.ammoBoxes.GroupBy(x => x.ammoDef.AmmoCategoryValue);
+
+                var shuffleBins = new List<AmmunitionBox>();
+                foreach (var cat in multiBins)
+                {
+                    if (cat.Count() > ModInit.modSettings.unShuffledBins)
+                    {
+                        foreach (var bin in cat.Skip(ModInit.modSettings.unShuffledBins))
+                        {
+                            shuffleBins.Add(bin);
+                            ModInit.modLog.LogMessage($"{bin.Description.Name}/{bin.Description.UIName} can be shuffled!");
+                        }
+                    }
+                }
 
 
-                foreach (var t1 in new List<MechComponent>(unit.allComponents))
+
+
+
+
+                //foreach (var t1 in new List<MechComponent>(unit.allComponents))
+                foreach (var t1 in new List<MechComponent>(shuffleBins))
                 {
                     if (t1.componentType == ComponentType.AmmunitionBox)
                     {
