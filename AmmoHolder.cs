@@ -13,8 +13,8 @@ namespace ShellShuffler
     {
         private static AmmoHolder _instance;
         public DataManager dataManager;
-        public List <AmmunitionDef> ammoList;
-        public List <AmmunitionBoxDef> ammoBoxList;
+        public List <AmmunitionDef> ammoList = new List<AmmunitionDef>();
+        public List <AmmunitionBoxDef> ammoBoxList = new List<AmmunitionBoxDef>();
 
         public static AmmoHolder AmmoHolderInstance
         {
@@ -31,14 +31,22 @@ namespace ShellShuffler
             ammoBoxList = new List<AmmunitionBoxDef>();
             foreach (var t in dataManager.AmmoBoxDefs)
             {
-                ammoBoxList.Add(t.Value);
-                ModInit.modLog.LogMessage($"Added Ammo Box Def: {t.Value.Description.Name} to ammoBoxList");
+                if (!t.Value.Description.Id.EndsWith("ContentAmmunitionBoxDef"))
+                {
+                    ammoBoxList.Add(t.Value);
+                    ModInit.modLog.LogMessage($"Added Ammo Box Def: {t.Value.Description.Name} to ammoBoxList with capacity {t.Value.Capacity}");
+                }
+                else
+                {
+                    ModInit.modLog.LogMessage($"Ammo Box Def: {t.Value.Description.Name} was ContentAmmunitionBoxDef, skipping.");
+                }
             }
             ammoList = new List<AmmunitionDef>();
             foreach (var t in dataManager.AmmoDefs)
             {
                 ammoList.Add(t.Value);
                 ModInit.modLog.LogMessage($"Added Ammo Def: {t.Value.Description.Name} to ammoList");
+
             }
         }
     }

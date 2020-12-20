@@ -1,6 +1,7 @@
 ﻿using System;
 using Harmony;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
@@ -10,12 +11,14 @@ using BattleTech;
 using UnityEngine;
 using ShellShuffler;
 using BattleTech.Data;
+using HBS.Util;
 using ShellShuffler.Init;
 
 namespace ShellShuffler.Patches
 {
     class ShellShufflerPatches
     {
+
         [HarmonyPatch(typeof(CombatGameState), "_Init",
             new Type[] {typeof(GameInstance), typeof(Contract), typeof(string)})]
         public static class CGS__Init_patch
@@ -82,11 +85,6 @@ namespace ShellShuffler.Patches
                         }
                     }
                 }
-
-
-
-
-
 
                 //foreach (var t1 in new List<MechComponent>(unit.allComponents))
                 foreach (var t1 in new List<MechComponent>(shuffleBins))
@@ -264,49 +262,48 @@ namespace ShellShuffler.Patches
 
                                     //sim.GenerateSimGameUID(),
                                     t1.uid, //new 111020
-                                    alternateBoxDef.ComponentType,
+                                    ComponentType.AmmunitionBox,
                                     t1.LocationDef.Location, -1, ComponentDamageLevel.Functional, false);
 
+                                
                                 Traverse.Create(mref).Property("Def").SetValue(alternateBoxDef);
+                                mref.RefreshComponentDef();
 
                                 AmmunitionBox repAB = new AmmunitionBox(mech, mref, 0.ToString());
+                                repAB.InitStats();
+                                //                                repAB.FromAmmunitionBoxRef(mref);
 
                                 mech.ammoBoxes.Remove(ab);
                                 mech.ammoBoxes.Add(repAB);
                                 mech.allComponents.Remove(ab);
                                 mech.allComponents.Add(repAB);
 
-//                            Traverse.Create(t1).Property("componentDef").SetValue(alternateBoxDef);
-//                            Traverse.Create(t1).Property("baseComponentRef").SetValue(mref); //added 111020
-//                            Traverse.Create(t1).Property("mechComponentRef").SetValue(mref);
-                                repAB.StatCollection.Reset(false); //added 111020
-                                repAB.InitStats();
+                                t1.FromMechComponentRef(mref);
                             }
 
                             if (unit is Vehicle)
-                            {
+                            { 
                                 var vic = unit as Vehicle;
                                 var vref = new VehicleComponentRef(alternateBoxDef.Description.Id,
 
                                     //sim.GenerateSimGameUID(),
                                     t1.uid, //new 111020
-                                    alternateBoxDef.ComponentType,
+                                    ComponentType.AmmunitionBox,
                                     t1.VehicleLocationDef.Location, -1, ComponentDamageLevel.Functional);
 
+                                
                                 Traverse.Create(vref).Property("Def").SetValue(alternateBoxDef);
+                                vref.RefreshComponentDef();
 
                                 AmmunitionBox repAB = new AmmunitionBox(vic, vref, 0.ToString());
+                                repAB.InitStats();
 
                                 vic.ammoBoxes.Remove(ab);
                                 vic.ammoBoxes.Add(repAB);
                                 vic.allComponents.Remove(ab);
                                 vic.allComponents.Add(repAB);
 
-                                //                            Traverse.Create(t1).Property("componentDef").SetValue(alternateBoxDef);
-                                //                            Traverse.Create(t1).Property("baseComponentRef").SetValue(mref); //added 111020
-                                //                            Traverse.Create(t1).Property("mechComponentRef").SetValue(mref);
-                                repAB.StatCollection.Reset(false); //added 111020
-                                repAB.InitStats();
+                                t1.FromVehicleComponentRef(vref);
                             }
 
                             if (unit is Turret)
@@ -316,23 +313,21 @@ namespace ShellShuffler.Patches
 
                                     //sim.GenerateSimGameUID(),
                                     t1.uid, //new 111020
-                                    alternateBoxDef.ComponentType,
+                                    ComponentType.AmmunitionBox,
                                     t1.VehicleLocationDef.Location, -1, ComponentDamageLevel.Functional);
 
+                                
                                 Traverse.Create(tref).Property("Def").SetValue(alternateBoxDef);
+                                tref.RefreshComponentDef();
 
                                 AmmunitionBox repAB = new AmmunitionBox(trt, tref, 0.ToString());
+                                repAB.InitStats();
 
                                 trt.ammoBoxes.Remove(ab);
                                 trt.ammoBoxes.Add(repAB);
                                 trt.allComponents.Remove(ab);
                                 trt.allComponents.Add(repAB);
 
-                                //                            Traverse.Create(t1).Property("componentDef").SetValue(alternateBoxDef);
-                                //                            Traverse.Create(t1).Property("baseComponentRef").SetValue(mref); //added 111020
-                                //                            Traverse.Create(t1).Property("mechComponentRef").SetValue(mref);
-                                repAB.StatCollection.Reset(false); //added 111020
-                                repAB.InitStats();
                             }
 
                         }
