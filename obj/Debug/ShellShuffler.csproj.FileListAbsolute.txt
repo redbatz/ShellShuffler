@@ -166,3 +166,4 @@ C:\Users\ajkroeger\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.csproj
 C:\Users\ajkroeger\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.csproj.CopyComplete
 C:\Users\ajkroeger\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.dll
 C:\Users\ajkroeger\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.pdb
+C:\Users\ajkroeger\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.csprojAssemblyReference.cache
