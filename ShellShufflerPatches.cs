@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -185,19 +186,20 @@ namespace ShellShuffler.Patches
 
                             if (ModInit.modSettings.factionAmmoList.Any())
                             {
-                                var unitFID = Traverse.Create(__instance).Field("factionID").GetValue<string>();
-
-                                if (ModInit.modSettings.factionAmmoList.ContainsKey(unitFID))
+                                var unitFID = __instance?.FactionValue?.Name;//Traverse.Create(__instance).Field("factionID").GetValue<string>();
+                                if (!string.IsNullOrEmpty(unitFID))
                                 {
-                                    List<string> factionAmmos = ModInit.modSettings.factionAmmoList[unitFID];
+                                    if (ModInit.modSettings.factionAmmoList.ContainsKey(unitFID))
+                                    {
+                                        List<string> factionAmmos = ModInit.modSettings.factionAmmoList[unitFID];
 
-                                    alternateDefsList.RemoveAll(x => !factionAmmos.Contains(x.Description.Id));
-                                    ammolog = string.Join("|", alternateDefsList);
-                                    ModInit.modLog.LogMessage(
-                                        $"Remaining valid ammos from faction list for {unit.Description.Name}: {ammolog}");
+                                        alternateDefsList.RemoveAll(x => !factionAmmos.Contains(x.Description.Id));
+                                        ammolog = string.Join("|", alternateDefsList);
+                                        ModInit.modLog.LogMessage(
+                                            $"Remaining valid ammos from faction list for {unit.Description.Name}: {ammolog}");
+                                    }
                                 }
                             }
-
 
                             //remove blacklisted ammo from shuffle pool
                             alternateDefsList.RemoveAll(x =>
