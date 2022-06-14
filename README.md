@@ -6,7 +6,7 @@ This mod provides the ability for OpFor ammunition loads to be dynamically rando
 #### Settings
 
 ```
-"Settings": {
+	"Settings": {
 		"enableLogging": true,
 		"shuffleMechs": true,
 		"shuffleVehicles": false,
@@ -14,23 +14,38 @@ This mod provides the ability for OpFor ammunition loads to be dynamically rando
 		"tagSetsUnion": false,
 		"chanceToShuffle": 0.6,
 		"unShuffledBins": 1,
-		"blackListShuffleIn": ["Ammunition_GAUSS_PR"],
-    		"blackListShuffleOut": ["Ammunition_GAUSS_PR"],
-		"mechDefTagAmmoList": 
-			{
-			"unit_role_brawler": ["Ammunition_LRM_ER", "Ammunition_LRM_Bee"],
-			"unit_role_sniper": ["Ammunition_LRM_ER", Ammunition_LRM_DF]
-			},
-		"factionAmmoList": 
-			{
-			"Marik": ["Ammunition_LRM_PR", "Ammunition_LRM_Bee"],
-			"AuriganPirates": ["Ammunition_AC5_Piercing", "Ammunition_AC5_AoE", "Ammunition_LRM_PR", "Ammunition_LRM_Bee"]
-			},
-		"ammoWeight":
-			{
+		"blackListShuffleIn": [
+			"Ammunition_GAUSS_PR"
+		],
+		"blackListShuffleOut": [
+			"Ammunition_GAUSS_PR"
+		],
+		"mechDefTagAmmoList": {
+			"unit_role_brawler": [
+				"Ammunition_LRM_ER",
+				"Ammunition_LRM_Bee"
+			],
+			"unit_role_sniper": [
+				"Ammunition_LRM_ER",
+				"Ammunition_LRM_DF"
+			]
+		},
+		"factionAmmoList": {
+			"Marik": [
+				"Ammunition_LRM_PR",
+				"Ammunition_LRM_Bee"
+			],
+			"AuriganPirates": [
+				"Ammunition_AC5_Piercing",
+				"Ammunition_AC5_AoE",
+				"Ammunition_LRM_PR",
+				"Ammunition_LRM_Bee"
+			]
+		},
+		"ammoWeight": {
 			"Ammunition_LRM_ER": 50
-			}
-	},
+		}
+	}
   
   ```
   
