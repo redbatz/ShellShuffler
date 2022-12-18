@@ -252,3 +252,10 @@ D:\Users\ajkro\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.csproj.Cor
 D:\Users\ajkro\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.csproj.CopyComplete
 D:\Users\ajkro\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.dll
 D:\Users\ajkro\Documents\GitHub\ShellShuffler\obj\Debug\ShellShuffler.pdb
+D:\Users\ajkro\Documents\GitHub\ShellShuffler\bin\Debug\AsmResolver.DotNet.dll
+D:\Users\ajkro\Documents\GitHub\ShellShuffler\bin\Debug\AsmResolver.PE.File.dll
+D:\Users\ajkro\Documents\GitHub\ShellShuffler\bin\Debug\AsmResolver.PE.dll
+D:\Users\ajkro\Documents\GitHub\ShellShuffler\bin\Debug\AsmResolver.dll
+D:\Users\ajkro\Documents\GitHub\ShellShuffler\bin\Debug\BepInEx.AssemblyPublicizer.MSBuild.dll
+D:\Users\ajkro\Documents\GitHub\ShellShuffler\bin\Debug\BepInEx.AssemblyPublicizer.dll
+D:\Users\ajkro\Documents\GitHub\ShellShuffler\bin\Debug\DOTween.dll

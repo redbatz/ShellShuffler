@@ -35,7 +35,7 @@ namespace ShellShuffler.Patches
         [HarmonyPatch(typeof(Team), "AddUnit", new Type[] {typeof(AbstractActor)})]
         public static class Team_AddUnit
         {
-            private static MethodInfo assignAmmo = AccessTools.Method(typeof(AbstractActor), "AssignAmmoToWeapons");
+            //private static MethodInfo assignAmmo = AccessTools.Method(typeof(AbstractActor), "AssignAmmoToWeapons");
             public static void Postfix(Team __instance, AbstractActor unit)
             {
                 if (unit.team.IsLocalPlayer) return;
@@ -267,8 +267,8 @@ namespace ShellShuffler.Patches
                                     ComponentType.AmmunitionBox,
                                     t1.LocationDef.Location, -1, ComponentDamageLevel.Functional, false);
 
-                                
-                                Traverse.Create(mref).Property("Def").SetValue(alternateBoxDef);
+
+                                mref.Def = alternateBoxDef;//Traverse.Create(mref).Property("Def").SetValue(alternateBoxDef);
                                 mref.RefreshComponentDef();
 
                                 AmmunitionBox repAB = new AmmunitionBox(mech, mref, 0.ToString());
@@ -293,8 +293,8 @@ namespace ShellShuffler.Patches
                                     ComponentType.AmmunitionBox,
                                     t1.VehicleLocationDef.Location, -1, ComponentDamageLevel.Functional);
 
-                                
-                                Traverse.Create(vref).Property("Def").SetValue(alternateBoxDef);
+
+                                vref.Def = alternateBoxDef;//Traverse.Create(vref).Property("Def").SetValue(alternateBoxDef);
                                 vref.RefreshComponentDef();
 
                                 AmmunitionBox repAB = new AmmunitionBox(vic, vref, 0.ToString());
@@ -319,7 +319,7 @@ namespace ShellShuffler.Patches
                                     t1.VehicleLocationDef.Location, -1, ComponentDamageLevel.Functional);
 
                                 
-                                Traverse.Create(tref).Property("Def").SetValue(alternateBoxDef);
+                                tref.Def = alternateBoxDef;
                                 tref.RefreshComponentDef();
 
                                 AmmunitionBox repAB = new AmmunitionBox(trt, tref, 0.ToString());
@@ -335,8 +335,8 @@ namespace ShellShuffler.Patches
                         }
                     }
                 }
-
-                assignAmmo.Invoke(unit, new object[]{});
+                unit.AssignAmmoToWeapons();
+                //assignAmmo.Invoke(unit, new object[]{});
                 //Traverse.Create(unit).Method("AssignAmmoToWeapons").GetValue();
             }
         }
