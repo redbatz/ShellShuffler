@@ -1,18 +1,8 @@
 ﻿using System;
-
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Remoting.Messaging;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 using BattleTech;
 using UnityEngine;
-using ShellShuffler;
-using BattleTech.Data;
-using HBS.Util;
 using ShellShuffler.Init;
 
 namespace ShellShuffler.Patches

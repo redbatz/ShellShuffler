@@ -1,13 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json;
 
 namespace ShellShuffler.Init
 {
-
-
     public static class ModInit
     {
         internal static Logger modLog;
@@ -32,7 +29,6 @@ namespace ShellShuffler.Init
             //harmony.PatchAll(Assembly.GetExecutingAssembly());
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), HarmonyPackage);
         }
-
     }
     public class ShellShufflerSettings
     {
