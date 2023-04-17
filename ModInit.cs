@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -28,8 +28,9 @@ namespace ShellShuffler.Init
                 ModInit.modSettings = new ShellShufflerSettings();
             }
             modLog = new Logger(modDir, "ShellShuffler", modSettings.enableLogging);
-            var harmony = HarmonyInstance.Create(HarmonyPackage);
-            harmony.PatchAll(Assembly.GetExecutingAssembly());
+            //var harmony = HarmonyInstance.Create(HarmonyPackage);
+            //harmony.PatchAll(Assembly.GetExecutingAssembly());
+            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), HarmonyPackage);
         }
 
     }

@@ -1,4 +1,7 @@
 # ShellShuffler
+
+**Versions 1.1.0.0 and higher requires modtek v3 or higher**
+
 ### Shamelessly Shuffles Shells for Shooting Shenanigans
 
 This mod provides the ability for OpFor ammunition loads to be dynamically randomized. Obviously will only work in conjunction with other mods that add additional ammo types.
