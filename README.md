@@ -17,6 +17,9 @@ This mod provides the ability for OpFor ammunition loads to be dynamically rando
 		"tagSetsUnion": false,
 		"chanceToShuffle": 0.6,
 		"unShuffledBins": 1,
+		"unitBlackList": [
+			"unit_noshuffle"
+		],
 		"blackListShuffleIn": [
 			"Ammunition_GAUSS_PR"
 		],
@@ -65,6 +68,8 @@ This mod provides the ability for OpFor ammunition loads to be dynamically rando
 `chanceToShuffle` - float, range 0 - 1.0; probability that ammo shuffling will occur among valid ammo types matching the weapon/ammo `Category` of the original. Thus, LRM ammo will only ever be replaced with LRM ammo, etc. The "pool" of valid ammo types <b>does</b> contain the original ammunition, <b>even if the original ammunition would normally not be allowed per the following settings</b>.
 
 `unShuffledBins` - int, number of same-ammo-category bins that will <b>not</b> be shuffled on the unit. Default value is 1: in this case, a unit with a single bin of LRM ammo would not shuffle. A unit with 2 bins of LRM ammo would shuffle only 1 of the bins, while the other would remain original to the unitDef. A unit with 3 bins of LRM ammo would shuffle 2 of the 3 bins, etc. Set to 0 to allow shuffling of all bins.
+
+`unitBlackList` - list<string>, units with any of these tags will never have any of their ammo shuffled
 
 `blackListShuffleIn` - List<string>, list of ammo Id's for ammo that will never be shuffled <b>into</b> a unit. Artemis IV and Nukes should probably go here.
 

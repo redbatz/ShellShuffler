@@ -29,7 +29,12 @@ namespace ShellShuffler.Patches
             public static void Postfix(Team __instance, AbstractActor unit)
             {
                 if (unit.team.IsLocalPlayer) return;
-
+                if (unit.GetStaticUnitTags().Any(x => ModInit.modSettings.unitBlackList.Contains(x)))
+                {
+                    ModInit.modLog.LogMessage(
+                        $"{unit.Description.Name} has blacklisted tag from unitBlackList; not shuffling!");
+                    return;
+                }
                 if (unit is Mech && !ModInit.modSettings.shuffleMechs)
                 {
                     ModInit.modLog.LogMessage(
