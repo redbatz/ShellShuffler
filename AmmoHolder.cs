@@ -29,6 +29,11 @@ namespace ShellShuffler
             {
                 if (!t.Value.Description.Id.EndsWith("ContentAmmunitionBoxDef"))
                 {
+                    if((t.Value.ComponentTags != null) && (t.Value.ComponentTags.ContainsAny(ModInit.modSettings.BlacklistAmmoboxOutTags)))
+                    {
+                        ModInit.modLog.LogMessage($"Skipping Ammo Box Def: {t.Value.Description.Name} due to blacklisted tags");
+                        continue;
+                    }
                     ammoBoxList.Add(t.Value);
                     ModInit.modLog.LogMessage($"Added Ammo Box Def: {t.Value.Description.Name} to ammoBoxList with capacity {t.Value.Capacity}");
                 }

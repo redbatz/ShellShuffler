@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using HBS.Collections;
 using Newtonsoft.Json;
 
 namespace ShellShuffler.Init
@@ -40,6 +41,27 @@ namespace ShellShuffler.Init
         public bool tagSetsUnion = false;
         public float chanceToShuffle = 1f;
         public int unShuffledBins = 1;
+        public int MaxTriesAmount = 10;
+        public List<string> blacklistAmmoboxOutTags = new List<string>();
+        private TagSet f_BlacklistAmmoboxOutTags = null;
+        public TagSet BlacklistAmmoboxOutTags
+        {
+            get
+            {
+                if (f_BlacklistAmmoboxOutTags == null) { f_BlacklistAmmoboxOutTags = new TagSet(blacklistAmmoboxOutTags); }
+                return f_BlacklistAmmoboxOutTags;
+            }
+        }
+        public List<string> blacklistAmmoboxInTags = new List<string>();
+        private TagSet f_BlacklistAmmoboxInTags = null;
+        public TagSet BlacklistAmmoboxInTags
+        {
+            get
+            {
+                if (f_BlacklistAmmoboxInTags == null) { f_BlacklistAmmoboxInTags = new TagSet(blacklistAmmoboxInTags); }
+                return f_BlacklistAmmoboxInTags;
+            }
+        }
         public List<string> unitBlackList = new List<string>();
         public List<string> blackListShuffleIn = new List<string>();
         public List<string> blackListShuffleOut = new List<string>();

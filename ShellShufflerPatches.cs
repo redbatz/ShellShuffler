@@ -76,6 +76,14 @@ namespace ShellShuffler.Patches
                     {
                         foreach (var bin in cat.Skip(ModInit.modSettings.unShuffledBins))
                         {
+                            if (bin.ammunitionBoxDef == null) {
+                                continue;
+                            }
+                            if((bin.ammunitionBoxDef.ComponentTags != null) && (bin.ammunitionBoxDef.ComponentTags.ContainsAny(ModInit.modSettings.BlacklistAmmoboxInTags)))
+                            {
+                                ModInit.modLog.LogMessage($"{bin.Description.Name}/{bin.Description.UIName}/{bin.defId} can't be shuffled!");
+                                continue;
+                            }
                             shuffleBins.Add(bin);
                             ModInit.modLog.LogMessage($"{bin.Description.Name}/{bin.Description.UIName} can be shuffled!");
                         }
@@ -224,7 +232,7 @@ namespace ShellShuffler.Patches
                                 }
                             }
 
-
+                            int watchdod = ModInit.modSettings.MaxTriesAmount;
                             ReChoose:
 
                             var idx = UnityEngine.Random.Range(0, alternateDefsList.Count());
@@ -242,6 +250,7 @@ namespace ShellShuffler.Patches
                             if (alternateBoxDef == null)
                             {
                                 ModInit.modLog.LogMessage($"Something borked, trying again.");
+
                                 goto ReChoose;
                             }
 
