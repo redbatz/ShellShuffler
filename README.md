@@ -36,6 +36,16 @@ This mod provides the ability for OpFor ammunition loads to be dynamically rando
 				"Ammunition_LRM_DF"
 			]
 		},
+		"mechDefTagRestrictedAmmoList": {
+			"unit_no_acid_ammo": [
+				"Ammunition_LRM_Acid",
+				"Ammunition_SRM_Acid"
+			],
+			"unit_no_ap_ammo": [
+				"Ammunition_LRM_AP",
+				"Ammunition_SRM_AP"
+			]
+		},
 		"factionAmmoList": {
 			"Marik": [
 				"Ammunition_LRM_PR",
@@ -50,6 +60,12 @@ This mod provides the ability for OpFor ammunition loads to be dynamically rando
 		},
 		"ammoWeight": {
 			"Ammunition_LRM_ER": 50
+		},
+		"blacklistAmmoboxOutTags": {
+		  "NeverShuffleOut"
+		},
+		"blacklistAmmoboxInTags": {
+		  "NeverShuffleIn"
 		}
 	}
   
@@ -76,7 +92,13 @@ This mod provides the ability for OpFor ammunition loads to be dynamically rando
 `blackListShuffleOut` - List<string>, list of ammo Id's for ammo that will never be shuffled <b>out of</b> a unit.
 
 `mechDefTagAmmoList` - Dictionary<List<string>>, units with the matching mechdef/vehicledef tag are restricted to shuffling in of ammos in the corresponding list. Where multiple tags are matched on a unit, the result depends on the value of `tagSetsUnion`. If `tagSetsUnion = false`, the result is an intersect of the ammo lists. For example, given the above settings a mech with both the `unit_role_brawler` and `unit_role_sniper` tags can only shuffle `Ammunition_LRM_ER`. If `tagSetsUnion = true`, the result is a union of the ammo lists. For example, given the above settings a mech with both the `unit_role_brawler` and `unit_role_sniper` tags can shuffle any of `Ammunition_LRM_ER`, `Ammunition_LRM_Bee`, or `Ammunition_LRM_DF`.
+
+`mechDefTagRestrictedAmmoList` - Dictionary<List<string>>, units with the matching mechdef/vehicledef tag are restricted from shuffling in of ammos in the corresponding list.
 	
 `factionAmmoList` - Dictionary<List<string>>, restricts the pool of available ammos based on factionID. Does <b>not</b> override results of `mechDefTagAmmoList`
 
 `ammoWeight` - Dictionary<string, int>, ammos in this list have their chances to be chosen during the shuffle increased by the corresponding factor. All ammos not listed have weight of `1`.
+
+`blacklistAmmoboxOutTags` - any ammunition boxes with a tag in this list will never be shuffled out
+
+`blacklistAmmoboxInTags` - any ammunition boxes with a tag in this list will never be shuffled in

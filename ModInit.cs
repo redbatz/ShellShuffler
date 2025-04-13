@@ -41,7 +41,6 @@ namespace ShellShuffler.Init
         public bool tagSetsUnion = false;
         public float chanceToShuffle = 1f;
         public int unShuffledBins = 1;
-        public int MaxTriesAmount = 10;
         public List<string> blacklistAmmoboxOutTags = new List<string>();
         private TagSet f_BlacklistAmmoboxOutTags = null;
         public TagSet BlacklistAmmoboxOutTags
@@ -67,6 +66,7 @@ namespace ShellShuffler.Init
         public List<string> blackListShuffleOut = new List<string>();
 
         public Dictionary<string, List<string>> mechDefTagAmmoList = new Dictionary<string, List<string>>();
+        public Dictionary<string, List<string>> mechDefTagRestrictedAmmoList = new Dictionary<string, List<string>>();
 
         public Dictionary<string, int> ammoWeight = new Dictionary<string, int>();
 
