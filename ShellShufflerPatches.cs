@@ -31,28 +31,28 @@ namespace ShellShuffler.Patches
                 if (unit.GetStaticUnitTags().Any(x => ModInit.modSettings.unitBlackList.Contains(x)))
                 {
                     ModInit.modLog.LogMessage(
-                        $"{unit.Description.Name} has blacklisted tag from unitBlackList; not shuffling!");
+                        $"{unit.Description.Id} has blacklisted tag from unitBlackList; not shuffling!");
                     return;
                 }
 
                 if (unit is Mech && !ModInit.modSettings.shuffleMechs)
                 {
                     ModInit.modLog.LogMessage(
-                        $"{unit.Description.Name} is Mech and shuffleMechs = false; not shuffling!");
+                        $"{unit.Description.Id} is Mech and shuffleMechs = false; not shuffling!");
                     return;
                 }
 
                 if (unit is Vehicle && !ModInit.modSettings.shuffleVehicles)
                 {
                     ModInit.modLog.LogMessage(
-                        $"{unit.Description.Name} is Vehicle and shuffleVehicles = false; not shuffling!");
+                        $"{unit.Description.Id} is Vehicle and shuffleVehicles = false; not shuffling!");
                     return;
                 }
 
                 if (unit is Turret && !ModInit.modSettings.shuffleTurrets)
                 {
                     ModInit.modLog.LogMessage(
-                        $"{unit.Description.Name} is Turret and shuffleTurrets = false; not shuffling!");
+                        $"{unit.Description.Id} is Turret and shuffleTurrets = false; not shuffling!");
                     return;
                 }
 
@@ -83,12 +83,12 @@ namespace ShellShuffler.Patches
 
                             if ((bin.ammunitionBoxDef.ComponentTags != null) && (bin.ammunitionBoxDef.ComponentTags.ContainsAny(ModInit.modSettings.BlacklistAmmoboxInTags)))
                             {
-                                ModInit.modLog.LogMessage($"{bin.Description.Name}/{bin.Description.UIName}/{bin.defId} can't be shuffled!");
+                                ModInit.modLog.LogMessage($"{bin.Description.Id} can't be shuffled!");
                                 continue;
                             }
 
                             shuffleBins.Add(bin);
-                            ModInit.modLog.LogMessage($"{bin.Description.Name}/{bin.Description.UIName} can be shuffled!");
+                            ModInit.modLog.LogMessage($"{bin.Description.Id} can be shuffled!");
                         }
                     }
                 }
@@ -104,40 +104,34 @@ namespace ShellShuffler.Patches
                         if (ab != null && ModInit.modSettings.blackListShuffleOut.Contains(ab.ammoDef.Description.Id))
                         {
                             ModInit.modLog.LogMessage(
-                                $"Original ammo {ab.ammoDef.Description.Name} is in blacklist, not shuffling!");
+                                $"Original ammo {ab.ammoDef.Description.Id} is in blacklist, not shuffling!");
                             return;
                         }
 
                         if (ab != null)
                         {
                             ModInit.modLog.LogMessage(
-                                $"Original Ammo Box: {ab.Description.Name}/{ab.Description.UIName}, Tonnage: {ab.tonnage}");
+                                $"Original Ammo Box: {ab.Description.Id}, Tonnage: {ab.tonnage}");
 
                             HashSet<AmmunitionDef> alternateAmmunitions = new HashSet<AmmunitionDef>();
 
-                            var alternateBoxDefsList = AmmoHolder.AmmoHolderInstance.ammoBoxesByCategory[ab.ammoCategoryValue];
-
-                            if (alternateBoxDefsList == null || !alternateBoxDefsList.Any())
+                            if (!AmmoHolder.AmmoHolderInstance.ammoBoxesByCategory.TryGetValue(ab.ammoCategoryValue, out var alternateBoxDefsList) || !alternateBoxDefsList.Any())
                             {
-                                ModInit.modLog.LogMessage($"No ammunition boxes found for category {ab.ammoCategoryValue}!");
+                                ModInit.modLog.LogMessage($"No ammunition boxes found for category {ab.ammoCategoryValue}");
                                 return;
                             }
 
                             ModInit.modLog.LogMessage($"Filtering potential ammo boxes and types by tonnage!");
                             alternateBoxDefsList = alternateBoxDefsList.Where(x => Math.Abs(x.Tonnage - ab.tonnage) < 0.01f).ToList();
                             
-                            foreach (var a in alternateBoxDefsList)
+                            foreach (var alt in alternateBoxDefsList)
                             {
-                                ModInit.modLog.LogMessage(
-                                    $"Possible ammo boxes: {a.Description.Name}/{a.Description.UIName} {a.Tonnage}t");
-                            }
-
-                            alternateAmmunitions = alternateBoxDefsList.Select(alt => AmmoHolder.AmmoHolderInstance.ammoById[alt.AmmoID]).ToHashSet();
-
-                            foreach (var a in alternateAmmunitions)
-                            {
-                                ModInit.modLog.LogMessage(
-                                    $"Tonnage and category matches found: {a.Description.Name}/{a.Description.UIName}");
+                                if (AmmoHolder.AmmoHolderInstance.ammoById.TryGetValue(alt.AmmoID, out var ammo))
+                                {
+                                    ModInit.modLog.LogMessage(
+                                        $"Possible ammo boxes: {alt.Description.Id} {alt.Tonnage}t for ammo {ammo.Description.Id}");
+                                    alternateAmmunitions.Add(ammo);
+                                }
                             }
 
                             string ammolog = string.Empty;
@@ -188,7 +182,7 @@ namespace ShellShuffler.Patches
                                         alternateAmmunitions.RemoveWhere(x => !tagVals.Contains(x.Description.Id));
                                         ammolog = string.Join(" | ", alternateAmmunitions.Select(x => x.Description.Id).ToList());
                                         ModInit.modLog.LogMessage(
-                                            $"Remaining valid ammos from tags for {unit.Description.Name}: {ammolog}");
+                                            $"Remaining valid ammos from tags for {unit.Description.Id}: {ammolog}");
                                     }
                                 }
                             }
@@ -198,14 +192,12 @@ namespace ShellShuffler.Patches
                                 var unitFID = __instance?.FactionValue?.Name; //Traverse.Create(__instance).Field("factionID").GetValue<string>();
                                 if (!string.IsNullOrEmpty(unitFID))
                                 {
-                                    if (ModInit.modSettings.factionAmmoList.ContainsKey(unitFID))
+                                    if (ModInit.modSettings.factionAmmoList.TryGetValue(unitFID, out var factionAmmos))
                                     {
-                                        List<string> factionAmmos = ModInit.modSettings.factionAmmoList[unitFID];
-
                                         alternateAmmunitions.RemoveWhere(x => !factionAmmos.Contains(x.Description.Id));
                                         ammolog = string.Join(" | ", alternateAmmunitions.Select(x => x.Description.Id).ToList());
                                         ModInit.modLog.LogMessage(
-                                            $"Remaining valid ammos from faction list for {unit.Description.Name}: {ammolog}");
+                                            $"Remaining valid ammos from faction list for {unit.Description.Id}: {ammolog}");
                                     }
                                 }
                             }
@@ -241,20 +233,19 @@ namespace ShellShuffler.Patches
 
                             ammolog = string.Join(" | ", alternateAmmunitions.Select(x => x.Description.Id).ToList());
                             ModInit.modLog.LogMessage(
-                                $"Remaining valid ammos for {unit.Description.Name}: {ammolog}");
+                                $"Remaining valid ammos for {unit.Description.Id}: {ammolog}");
 
-                            if (!alternateAmmunitions.Contains(ab.ammoDef))
+                            if (alternateAmmunitions.Add(ab.ammoDef))
                             {
-                                alternateAmmunitions.Add(ab.ammoDef); //make sure original is still in list
-                                ModInit.modLog.LogMessage(
-                                    $"Original {ab.ammoDef.Description.Name}/{ab.ammoDef.Description.UIName} not in list due to filter, adding it back.");
+                                //make sure original is still in list
+                                ModInit.modLog.LogMessage($"Original {ab.ammoDef.Description.Id} not in list due to filter, adding it back.");
                             }
 
                             foreach (var ammodef in new List<AmmunitionDef>(alternateAmmunitions))
                             {
-                                if (ModInit.modSettings.ammoWeight.ContainsKey(ammodef.Description.Id))
+                                if (ModInit.modSettings.ammoWeight.TryGetValue(ammodef.Description.Id, out var weight))
                                 {
-                                    for (int i = 0; i < ModInit.modSettings.ammoWeight[ammodef.Description.Id]; i++)
+                                    for (int i = 0; i < weight; i++)
                                     {
                                         alternateAmmunitions.Add(ammodef);
                                     }
@@ -280,13 +271,12 @@ namespace ShellShuffler.Patches
 
                             var idx = UnityEngine.Random.Range(0, possibleSelections.Count);
                             var selection = possibleSelections.ElementAt(idx);
-                            ModInit.modLog.LogMessage($"Replacement Box Chosen: {selection.Key.Description.Name}/{selection.Key.Description.UIName} of ammunition {selection.Value.Description.Name}/{selection.Value.Description.UIName}");
+                            ModInit.modLog.LogMessage($"Replacement Box Chosen: {selection.Key.Description.Id} of ammunition {selection.Value.Description.Id}");
 
                             var alternateBoxDef = selection.Key;
 
                             alternateBoxDef.refreshAmmo(AmmoHolder.AmmoHolderInstance.dataManager);
-                            ModInit.modLog.LogMessage(
-                                $"Swapping {ab.Description.Name}/{ab.Description.UIName} for {alternateBoxDef?.Description?.Name}/{alternateBoxDef?.Description?.UIName}.");
+                            ModInit.modLog.LogMessage($"Swapping {ab.Description.Id} for {alternateBoxDef?.Description.Id}.");
 
                             //    var sim = UnityGameInstance.BattleTechGame.Simulation;
 
